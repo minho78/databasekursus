@@ -330,22 +330,29 @@ $conn = null;
 				).append(
 					$('<label>').text(' kr.'))
 			).append(
-				$('<input class="editbutton">').attr('id','bookeditbutton').attr('type','button').val("Ret oplysninger").on("click",
-					function(e){
-						if($('.title label').is(":hidden")) {
-							var aut_ids = []; var cat_ids = [];
-							for (var i=0; i<aut_dat.length; i++) {aut_ids.push(aut_dat[i]);}
-							for (var i=0; i<cat_dat.length; i++) {cat_ids.push(cat_dat[i]);}
-							saveBookInfo(bookId,aut_ids,cat_ids);
-							$('#bookeditbutton').attr("value","Ret oplysninger");
+				$('<div class="bookbuttons">').append(
+					$('<input class="bookbutton">').attr('id','bookdeletebutton').attr('type','button').val("Slet bog").on("click",
+						function(e){
+							deleteBook(bookId);
 						}
-						else
-							$('#bookeditbutton').attr("value","Gem oplysninger");
-						toggleHiddenElements();
-					})
-			).on("click",function(e){
-				$(this).addClass("selected").siblings().removeClass("selected");
-			})
+					)
+				).append(
+					$('<input class="bookbutton">').attr('id','bookeditbutton').attr('type','button').val("Ret oplysninger").on("click",
+						function(e){
+							if($('.title label').is(":hidden")) {
+								var aut_ids = []; var cat_ids = [];
+								for (var i=0; i<aut_dat.length; i++) {aut_ids.push(aut_dat[i]);}
+								for (var i=0; i<cat_dat.length; i++) {cat_ids.push(cat_dat[i]);}
+								saveBookInfo(bookId,aut_ids,cat_ids);
+								$('#bookeditbutton').attr("value","Ret oplysninger");
+							}
+							else
+								$('#bookeditbutton').attr("value","Gem oplysninger");
+							toggleHiddenElements();
+						})
+				).on("click",function(e){
+					$(this).addClass("selected").siblings().removeClass("selected");
+				}))
 		);
 		
 		$('.title_author').append($('<div class="summary">').append($('<label>').text(book_dat[0][2])).append($('<textarea placeholder="Resumé">').attr('rows',10).attr('cols',30).val(book_dat[0][2]).hide()));
@@ -476,6 +483,19 @@ $conn = null;
 	}
 	
 	
+	function deleteBook(bookId) {
+		var del = confirm('Er du sikker på at du vil slette bogen?');
+		
+		if (del) {
+			$.post("deleteBook.php", {
+				bookId: bookId
+			},
+			function(data,status){
+				window.location.href="index.php?allbooks";
+			});
+		}
+	}
+	
 	// ----------------------------------------------------------------------------------------------- //
 	
 	
@@ -534,20 +554,29 @@ $conn = null;
 		$('.author').append(
 			$('<div class="authorbooks">').html('Forfatterens bøger:<br/>')
 		).append(
-			$('<input class="editbutton">').attr('id','authoreditbutton').attr('type','button').val("Ret oplysninger").on("click",
-				function(e){
-					$('.authorname>label').toggle();
-					$('.authorname>div').toggle();
-					$('.authoremail>label').toggle();
-					$('.authoremail>input').toggle();
-					//$('.bookauthor>label').toggle();
-					if(!$('.authorname>label').is(":hidden")) {
-						saveAuthorInfo(authorId);
-						$('#authoreditbutton').attr("value","Ret oplysninger");
+			$('<div class="authorbuttons">').append(
+				$('<input class="authorbutton">').attr('id','authordeletebutton').attr('type','button').val("Slet forfatter").on("click",
+					function(e){
+						deleteAuthor(authorId);
 					}
-					else
-						$('#authoreditbutton').attr("value","Gem oplysninger");
-				}
+				)
+			).append(
+				$('<input class="authorbutton">').attr('id','authoreditbutton').attr('type','button').val("Ret oplysninger").on("click",
+					function(e){
+						$('#authordeletebutton').toggle();
+						$('.authorname>label').toggle();
+						$('.authorname>div').toggle();
+						$('.authoremail>label').toggle();
+						$('.authoremail>input').toggle();
+						//$('.bookauthor>label').toggle();
+						if(!$('.authorname>label').is(":hidden")) {
+							saveAuthorInfo(authorId);
+							$('#authoreditbutton').attr("value","Ret oplysninger");
+						}
+						else
+							$('#authoreditbutton').attr("value","Gem oplysninger");
+					}
+				)
 			)
 		);
 		for (var i=0; i<book_dat.length;i++)
@@ -651,10 +680,25 @@ $conn = null;
 		);
 	}
 	
+	
+	function deleteAuthor(authorId) {
+		var del = confirm('Er du sikker på at du vil slette forfatteren?');
+		
+		if (del) {
+			$.post("deleteAuthor.php", {
+				authorId: authorId
+			},
+			function(data,status){
+				window.location.href="index.php?allauthors";
+			});
+		}
+	}
+	
 	// ----------------------------------------------------------------------------------------------- //
 	
 	
 	function toggleHiddenElements() {
+		$('#bookdeletebutton').toggle();
 		$('.title input').toggle();
 		$('.title label').toggle();
 		//$('.saveeditbutton').toggle();
